@@ -4,11 +4,12 @@ Modify this file to implement your own solvers.
 
 For usage, run `python3 solve.py --help`.
 """
-
+import numpy as np
 import argparse
 from pathlib import Path
 import sys
 from typing import Callable, Dict
+from point import Point
 
 from instance import Instance
 from solution import Solution
@@ -21,9 +22,32 @@ def solve_naive(instance: Instance) -> Solution:
         towers=instance.cities,
     )
 
+def num_new_cities(instance: Instance, coord: Point, uncovered: set):
+    res = 0
+    r_sq = instance.R_s**2
+    for x in range(coord[0] - instance.R_s(), coord[0] + instance.R_s() + 1):
+        for y in range(coord[1] - instance.R_s(), coord[1] + instance.R_s() + 1):
+            if x >= 0 and x < instance.D() and y >= 0 and y < instance.D():
+                if Point.distance_sq(Point(x, y), coord) <= r_sq and Point(x,y) in uncovered:
+                    res += 1
+
+    
+
+def solve_greedy(instance: Instance) -> Solution:
+    #O(D^2*(R_s)^2*N)
+    uncovered = set(instance.cities)
+    while uncovered:
+        #For every point in the grid, compute number of new cities that will be covered if
+        #a tower was placed there. Then place a tower at the best point.
+        arr = np.array([[num_new_cities(instance, Point(x,y), uncovered) for y in range(instance.D())] for x in range(instance.D())])
+        maxCities = np.max(arr)
+        
+
+        
 
 SOLVERS: Dict[str, Callable[[Instance], Solution]] = {
-    "naive": solve_naive
+    "naive": solve_naive,
+    "greedy": solve_greedy
 }
 
 
