@@ -32,8 +32,6 @@ def num_new_cities(instance: Instance, coord: Point, uncovered: set):
                     res += 1
     return res
 
-    
-
 def solve_greedy(instance: Instance) -> Solution:
     #O(D^2*(R_s)^2*N)
     uncovered = set(instance.cities)
